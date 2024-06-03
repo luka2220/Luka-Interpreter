@@ -31,7 +31,74 @@ class LexerTest {
             // NOTE: Fail the test if the TokenType from the test lexer(l) does
             // not equal the expected TokenType value from the tests array
             if (tok.getType() != tests[i].getType()) {
-                fail(String.format("test[%d] - tokentype wrong. expected=%q, got=%q", i, tests[i].getType(), tok.getType()));
+                fail(String.format("test[%d] - tokentype wrong. expected=%s, got=%s", i, tests[i].getType(), tok.getType()));
+            }
+
+            // NOTE: Fail the test if the string literal from the test lexer(l) does not
+            // equal the expected string literal value from the test array
+            if (!tok.getLiteral().equals(tests[i].getLiteral())) {
+                fail(String.format("test[%d] - token literal wrong. expected=%s, got=%s", i, tests[i].getLiteral(), tok.getLiteral()));
+            }
+        }
+    }
+
+    @Test
+    void testNextToken2() {
+        Token [] tests = new Token[]{
+                new Token(TokenTypes.LET, "let"),
+                new Token(TokenTypes.IDENT, "five"),
+                new Token(TokenTypes.ASSIGN, "="),
+                new Token(TokenTypes.INT, "5"),
+                new Token(TokenTypes.SEMICOLON, ";"),
+                new Token(TokenTypes.LET, "let"),
+                new Token(TokenTypes.IDENT, "ten"),
+                new Token(TokenTypes.ASSIGN, "="),
+                new Token(TokenTypes.INT, "10"),
+                new Token(TokenTypes.SEMICOLON, ";"),
+                new Token(TokenTypes.LET, "let"),
+                new Token(TokenTypes.IDENT, "add"),
+                new Token(TokenTypes.ASSIGN, "="),
+                new Token(TokenTypes.FUNCTION, "fn"),
+                new Token(TokenTypes.LPAREN, "("),
+                new Token(TokenTypes.IDENT, "x"),
+                new Token(TokenTypes.COMMA, ","),
+                new Token(TokenTypes.IDENT, "y"),
+                new Token(TokenTypes.RPAREN, ")"),
+                new Token(TokenTypes.LBRACE, "{"),
+                new Token(TokenTypes.IDENT, "x"),
+                new Token(TokenTypes.PLUS, "+"),
+                new Token(TokenTypes.IDENT, "y"),
+                new Token(TokenTypes.SEMICOLON, ";"),
+                new Token(TokenTypes.RBRACE, "}"),
+                new Token(TokenTypes.SEMICOLON, ";"),
+                new Token(TokenTypes.LET, "let"),
+                new Token(TokenTypes.IDENT, "result"),
+                new Token(TokenTypes.ASSIGN, "="),
+                new Token(TokenTypes.IDENT, "add"),
+                new Token(TokenTypes.LPAREN, "("),
+                new Token(TokenTypes.IDENT, "five"),
+                new Token(TokenTypes.COMMA, ","),
+                new Token(TokenTypes.IDENT, "ten"),
+                new Token(TokenTypes.RPAREN, ")"),
+                new Token(TokenTypes.SEMICOLON, ";"),
+                new Token(TokenTypes.EOF, ""),
+        };
+
+        l = new Lexer("let five = 5;\n" +
+                "let ten = 10;\n" +
+                "     \n" +
+                "let add = fn(x, y) {\n" +
+                "   x + y;\n" +
+                "};\n" +
+                "let result = add(five, ten);");
+
+        for (int i = 0; i < tests.length; i++) {
+            Token tok = l.NextToken();
+
+            // NOTE: Fail the test if the TokenType from the test lexer(l) does
+            // not equal the expected TokenType value from the tests array
+            if (tok.getType() != tests[i].getType()) {
+                fail(String.format("test[%d] - tokentype wrong. expected=%s, got=%s", i, tests[i].getType(), tok.getType()));
             }
 
             // NOTE: Fail the test if the string literal from the test lexer(l) does not

@@ -4,7 +4,7 @@ import org.example.token.Token;
 import org.example.token.TokenTypes;
 
 public class Lexer {
-    private String input;
+    private final String input;
     private int position;        // current position in the input (points to the current char)
     private int readPosition;    // current reading position in the input (points to next char)
     private byte ch;             // current char under examination
@@ -30,6 +30,8 @@ public class Lexer {
     // advances the position in the lexer by calling readChar()
     public Token NextToken() {
         Token tok;
+
+        skipWhiteSpace();
 
         switch (this.ch) {
             case '=':
@@ -60,11 +62,61 @@ public class Lexer {
                 tok = new Token(TokenTypes.EOF, "");
                 break;
             default:
-                tok = new Token(TokenTypes.ILLEGAL, Character.toString(this.ch));
-                break;
-        }
+                if (isLetter(this.ch)) {
+                    tok = new Token();
+                    tok.setLiteral(readIdentifier());
+                    tok.setType(tok.LookupIdent(tok.getLiteral()));
+                    return tok;
+                } else if (isDigit(this.ch)) {
+                    tok = new Token();
+                    tok.setLiteral(readNumber());
+                    tok.setType(TokenTypes.INT);
+                    return tok;
+                } else {
+                    tok = new Token(TokenTypes.ILLEGAL, Character.toString(this.ch));
+                }
+        };
 
         this.readChar();
         return tok;
+    }
+
+    // NOTE: Removes all the whitespace from the code
+    private void skipWhiteSpace() {
+        while (this.ch == ' ' || this.ch == '\t' || this.ch == '\n' || this.ch == '\r') {
+            readChar();
+        }
+    }
+
+    // NOTE: Reads an identifier token until it encounters a non-letter token
+    private String readIdentifier() {
+        int pos = this.position;
+
+        while (isLetter(this.ch)) {
+            this.readChar();
+        }
+
+        return this.input.substring(pos, this.position);
+    }
+
+    // NOTE: Checks if the current token is a letter
+    private boolean isLetter(byte ch) {
+        return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_';
+    }
+
+    // NOTE: Reads a number token until it encounters a non-number token
+    private String readNumber() {
+        int pos = this.position;
+
+        while (isDigit(this.ch)) {
+            this.readChar();
+        }
+
+        return this.input.substring(pos, this.position);
+    }
+
+    // NOTE: Checks if the current token is a number
+    private boolean isDigit(byte ch) {
+        return '0' <= ch && ch <= '9';
     }
 }
