@@ -35,7 +35,24 @@ public class Lexer {
 
         switch (this.ch) {
             case '=':
-                tok = new Token(TokenTypes.ASSIGN, "=");
+                if (peekChar() == '=') {
+                    byte lch = this.ch;
+                    readChar();
+                    String literal = "" + (char) lch + (char) this.ch;
+                    tok = new Token(TokenTypes.EQ, literal);
+                } else {
+                    tok = new Token(TokenTypes.ASSIGN, "=");
+                }
+                break;
+            case '!':
+                if (peekChar() == '=') {
+                    byte lch = this.ch;
+                    readChar();
+                    String literal = "" + (char) lch + (char) this.ch;
+                    tok = new Token(TokenTypes.NOT_EQ, literal);
+                } else {
+                    tok = new Token(TokenTypes.BANG, "!");
+                }
                 break;
             case ';':
                 tok = new Token(TokenTypes.SEMICOLON, ";");
@@ -57,6 +74,21 @@ public class Lexer {
                 break;
             case '+':
                 tok = new Token(TokenTypes.PLUS, "+");
+                break;
+            case '-':
+                tok = new Token(TokenTypes.MINUS, "-");
+                break;
+            case '*':
+                tok = new Token(TokenTypes.ASTERISK, "*");
+                break;
+            case '/':
+                tok = new Token(TokenTypes.SLASH, "/");
+                break;
+            case '<':
+                tok = new Token(TokenTypes.LT, "<");
+                break;
+            case '>':
+                tok = new Token(TokenTypes.GT, ">");
                 break;
             case 0:
                 tok = new Token(TokenTypes.EOF, "");
@@ -85,6 +117,15 @@ public class Lexer {
     private void skipWhiteSpace() {
         while (this.ch == ' ' || this.ch == '\t' || this.ch == '\n' || this.ch == '\r') {
             readChar();
+        }
+    }
+
+    // NOTE: Looks at the char in the next position but does not increase the current position
+    private byte peekChar() {
+        if (this.readPosition >= this.input.length()) {
+            return 0;
+        } else {
+            return (byte) this.input.charAt(this.readPosition);
         }
     }
 

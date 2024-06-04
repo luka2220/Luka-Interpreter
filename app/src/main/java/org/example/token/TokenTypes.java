@@ -16,7 +16,20 @@ public enum TokenTypes {
     LBRACE("{"),
     RBRACE("}"),
     FUNCTION("FUNCTION"),
-    LET("LET");
+    LET("LET"),
+    MINUS("-"),
+    BANG("!"),
+    ASTERISK("*"),
+    SLASH("/"),
+    LT("<"),
+    GT(">"),
+    IF("IF"),
+    ELSE("ELSE"),
+    RETURN("RETURN"),
+    TRUE("TRUE"),
+    FALSE("FALSE"),
+    EQ("=="),
+    NOT_EQ("!=");
 
     private final String literal;
 

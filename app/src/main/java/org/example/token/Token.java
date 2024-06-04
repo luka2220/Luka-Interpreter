@@ -10,6 +10,11 @@ public class Token {
     {
         keywords.put("fn", TokenTypes.FUNCTION);
         keywords.put("let", TokenTypes.LET);
+        keywords.put("if", TokenTypes.IF);
+        keywords.put("else", TokenTypes.ELSE);
+        keywords.put("return", TokenTypes.RETURN);
+        keywords.put("true", TokenTypes.TRUE);
+        keywords.put("false", TokenTypes.FALSE);
     };
 
     public Token() {}
