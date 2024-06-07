@@ -3,6 +3,7 @@ package org.example.parser;
 import org.example.ast.Identifier;
 import org.example.ast.LetStatement;
 import org.example.ast.Program;
+import org.example.ast.ReturnStatement;
 import org.example.ast.contracts.Statement;
 import org.example.lexer.Lexer;
 import org.example.token.Token;
@@ -56,6 +57,9 @@ public class Parser {
             case LET -> {
                 return this.parseLetStatement();
             }
+            case RETURN -> {
+                return this.parseReturnStatement();
+            }
             default -> {
                 return null;
             }
@@ -74,6 +78,19 @@ public class Parser {
         if (!this.expectPeek(TokenTypes.ASSIGN)) {
             return null;
         }
+
+        // TODO: We're skipping the expressions until we encounter a semicolon
+        while (!this.curTokenIs(TokenTypes.SEMICOLON)) {
+            this.nextToken();
+        }
+
+        return stmt;
+    }
+
+    private ReturnStatement parseReturnStatement() {
+        ReturnStatement stmt = new ReturnStatement(curToken);
+
+        this.nextToken();
 
         // TODO: We're skipping the expressions until we encounter a semicolon
         while (!this.curTokenIs(TokenTypes.SEMICOLON)) {

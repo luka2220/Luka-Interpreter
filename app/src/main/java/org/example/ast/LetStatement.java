@@ -4,6 +4,7 @@ import org.example.ast.contracts.Expression;
 import org.example.ast.contracts.Statement;
 import org.example.token.Token;
 
+// NOTE: Node data structure for representing let statements
 public class LetStatement implements Statement {
     private Token token;    // the token.LET token
     private Identifier name;
@@ -13,18 +14,19 @@ public class LetStatement implements Statement {
         this.token = token;
     }
 
-    @Override
-    public void statementNode() {}
-
-    public String tokenLiteral() {
-        return this.token.getLiteral();
-    }
-
     public Identifier getName() {
         return this.name;
     }
 
     public void setName(Identifier name) {
         this.name = name;
+    }
+
+    @Override
+    public void statementNode() {}
+
+    @Override
+    public String tokenLiteral() {
+        return this.token.getLiteral();
     }
 }

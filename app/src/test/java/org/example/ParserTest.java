@@ -2,6 +2,7 @@ package org.example;
 
 import org.example.ast.LetStatement;
 import org.example.ast.Program;
+import org.example.ast.ReturnStatement;
 import org.example.ast.contracts.Statement;
 import org.example.lexer.Lexer;
 import org.example.parser.Parser;
@@ -14,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ParserTest {
     @Test
     void testLetStatements() {
-        // NOTE: let statements code test piece
+        // NOTE: let statements code test
         String input = "let x = 5;\n" +
                 "let y = 10;\n" +
                 "let foobar = 838383;\n";
@@ -36,9 +37,39 @@ public class ParserTest {
         }
     }
 
+    @Test
+    void testReturnStatements() {
+        // NOTE: Return statement test code
+        String input = "return 5;\n" +
+                "return 10;\n" +
+                "return 993322;\n";
+
+        Lexer lexer = new Lexer(input);
+        Parser parser = new Parser(lexer);
+
+        Program program = parser.parseProgram();
+        this.checkParserErrors(parser);
+
+        assertNotNull(program, "parseProgram() returned null. ❌");
+        assertEquals(3, program.getStatements().size(), "program.Statements does not contain 3 statements. ❌");
+
+        for (int i = 0; i < program.getStatements().size(); i++) {
+            Statement stmt = program.getStatements().get(i);
+
+            if (!(stmt instanceof ReturnStatement)) {
+                fail("stmt is not ReturnStatement, got=" + stmt);
+                continue;
+            }
+
+            if (!stmt.tokenLiteral().equals("return")) {
+                fail("stmt literal is not 'return', got " + stmt.tokenLiteral());
+            }
+        }
+    }
+
     private boolean testLetStatement(Statement stmt, String expectedName) {
         if (!stmt.tokenLiteral().equals("let")) {
-            fail("TokenLiteral not 'Let', got " + stmt.tokenLiteral());
+            fail("TokenLiteral not 'let', got " + stmt.tokenLiteral());
             return false;
         }
 
