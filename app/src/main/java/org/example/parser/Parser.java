@@ -9,14 +9,18 @@ import org.example.token.Token;
 import org.example.token.TokenTypes;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Parser {
     private Lexer l;
     private Token curToken;
     private Token peekToken;
+    private List<String> errors;
 
     public Parser(Lexer l) {
         this.l = l;
+        this.errors = new ArrayList<>();
+
         // Read two tokens, so curToken and peekToken are both set
         this.nextToken();
         this.nextToken();
@@ -27,11 +31,15 @@ public class Parser {
         this.peekToken = l.NextToken();
     }
 
+    public List<String> Errors() {
+        return this.errors;
+    }
+
     public Program parseProgram() {
         Program program = new Program();
-        program.setStatements(new ArrayList<Statement>());
+        program.setStatements(new ArrayList<>());
 
-        while (this.curToken.getType() != TokenTypes.EOF) {
+        while (!this.curTokenIs(TokenTypes.EOF)) {
             Statement stmt = parseStatement();
             if (stmt != null) {
                 program.getStatements().add(stmt);
@@ -67,7 +75,6 @@ public class Parser {
             return null;
         }
 
-
         // TODO: We're skipping the expressions until we encounter a semicolon
         while (!this.curTokenIs(TokenTypes.SEMICOLON)) {
             this.nextToken();
@@ -84,11 +91,21 @@ public class Parser {
         return this.peekToken.getType().equals(token);
     }
 
+    // NOTE: Helper function to add error messages to list errors
+    private void peekError(TokenTypes token) {
+        String msg = "expected next token to be " + token.getLiteral() +
+                ", got " + this.peekToken.getLiteral();
+
+        this.errors.add(msg);
+    }
+
+    // NOTE: enforce the correctness of the order of tokens by checking the type of the next token
     private boolean expectPeek(TokenTypes token) {
         if (this.peekTokenIs(token)) {
             this.nextToken();
             return true;
         } else {
+            this.peekError(token);
             return false;
         }
     }

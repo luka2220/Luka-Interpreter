@@ -6,6 +6,9 @@ import org.example.ast.contracts.Statement;
 import org.example.lexer.Lexer;
 import org.example.parser.Parser;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ParserTest {
@@ -20,6 +23,7 @@ public class ParserTest {
         Parser parser = new Parser(lexer);
 
         Program program = parser.parseProgram();
+        this.checkParserErrors(parser);
 
         assertNotNull(program, "parseProgram() returned null. ❌");
         assertEquals(3, program.getStatements().size(), "program.Statements does not contain 3 statements. ❌");
@@ -28,7 +32,7 @@ public class ParserTest {
 
         for (int i = 0; i < expectedIdentifiers.length; i++) {
             Statement stmt = program.getStatements().get(i);
-            assertTrue(testLetStatement(stmt, expectedIdentifiers[i]), "Let statement test failed. ❌");
+            assertTrue(this.testLetStatement(stmt, expectedIdentifiers[i]), "Let statement test failed. ❌");
         }
     }
 
@@ -57,5 +61,20 @@ public class ParserTest {
         }
 
         return true;
+    }
+
+    private void checkParserErrors(Parser p) {
+        List<String> errors = p.Errors();
+
+        if (errors.isEmpty()) {
+            return;
+        }
+
+        StringBuilder errorMsg = new StringBuilder("The parser has " + errors.size() + " errors:\n");
+        for (String error: errors) {
+            errorMsg.append("parser error: " + error + "\n");
+        }
+
+        fail(errorMsg.toString());
     }
 }
