@@ -57,7 +57,7 @@ public class ParserTest {
             Statement stmt = program.getStatements().get(i);
 
             if (!(stmt instanceof ReturnStatement)) {
-                fail("stmt is not LetStatement, got=" + stmt);
+                fail("stmt is not ReturnStatement, got=" + stmt);
                 continue;
             }
 
