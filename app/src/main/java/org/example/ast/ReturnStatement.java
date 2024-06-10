@@ -4,7 +4,9 @@ import org.example.ast.contracts.Expression;
 import org.example.ast.contracts.Statement;
 import org.example.token.Token;
 
-// NOTE: A Node data structure for representing return statements
+/**
+ * A Node data structure for representing return statements
+ * */
 public class ReturnStatement implements Statement {
     private Token token;
     private Expression returnValue;
@@ -19,7 +21,20 @@ public class ReturnStatement implements Statement {
     }
 
     @Override
-    public void statementNode() {
+    public String string() {
+        StringBuilder out = new StringBuilder();
 
+        out.append(this.tokenLiteral()).append(" ");
+
+        if (this.returnValue != null) {
+            out.append(this.returnValue.string());
+        }
+
+        out.append(";");
+
+        return out.toString();
     }
+
+    @Override
+    public void statementNode() {}
 }

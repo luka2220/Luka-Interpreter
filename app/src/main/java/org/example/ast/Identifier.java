@@ -4,8 +4,8 @@ import org.example.ast.contracts.Expression;
 import org.example.token.Token;
 
 public class Identifier implements Expression {
-    private Token token;
-    private String value;
+    private final Token token;
+    private final String value;
 
     public Identifier(Token token, String value) {
         this.token = token;
@@ -18,6 +18,11 @@ public class Identifier implements Expression {
     @Override
     public String tokenLiteral() {
         return this.token.getLiteral();
+    }
+
+    @Override
+    public String string() {
+        return this.value;
     }
 
     public String getValue() {

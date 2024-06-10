@@ -108,7 +108,9 @@ public class Parser {
         return this.peekToken.getType().equals(token);
     }
 
-    // NOTE: Helper function to add error messages to list errors
+    /**
+     * Helper function to add error messages to list errors
+     * */
     private void peekError(TokenTypes token) {
         String msg = "expected next token to be " + token.getLiteral() +
                 ", got " + this.peekToken.getLiteral();
@@ -116,7 +118,9 @@ public class Parser {
         this.errors.add(msg);
     }
 
-    // NOTE: enforce the correctness of the order of tokens by checking the type of the next token
+    /**
+     * Enforces the correctness of the order of tokens by checking the type of the next token
+     * */
     private boolean expectPeek(TokenTypes token) {
         if (this.peekTokenIs(token)) {
             this.nextToken();
