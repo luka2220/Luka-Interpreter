@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.ast.*;
+import org.example.ast.contracts.Expression;
 import org.example.ast.contracts.Statement;
 import org.example.lexer.Lexer;
 import org.example.parser.Parser;
@@ -99,6 +100,42 @@ public class ParserTest {
                 String.format("ident.Value not %s. got=%s", "foobar", ident.getValue()));
         assertEquals("foobar", ident.tokenLiteral(),
                 String.format("ident.TokenLiteral not %s. got=%s", "foobar", ident.tokenLiteral()));
+
+    }
+
+    @Test
+    void testIntegerLiteralExpressions() {
+        String input = "5;";
+
+        Lexer lexer = new Lexer(input);
+        Parser parser = new Parser(lexer);
+        Program program = parser.parseProgram();
+
+        this.checkParserErrors(parser);
+
+        if (program.getStatements().size() != 1) {
+            StringBuilder msg = new StringBuilder();
+            msg.append("Program does not have enough statements, got=").append(program.getStatements().size());
+            fail(msg.toString());
+        }
+
+        Statement stmt = program.getStatements().get(0);
+        assertTrue(stmt instanceof ExpressionStatement,
+                String.format("program.Statements[0] is not ExpressionStatement. got=%s", stmt.getClass().getSimpleName()));
+
+        ExpressionStatement expStmt = (ExpressionStatement) stmt;
+        assertTrue(expStmt.getExpression() instanceof IntegerLiteral,
+                "exp not IntegerLiteral. got=" + expStmt.getExpression().getClass().getSimpleName());
+
+        IntegerLiteral literal = (IntegerLiteral) expStmt.getExpression();
+
+        // Check the value of the literal
+        assertEquals(5, literal.getValue(),
+                "literal.Value not 5. got=" + literal.getValue());
+
+        // Check the token literal of the literal
+        assertEquals("5", literal.tokenLiteral(),
+                "literal.TokenLiteral not 5. got=" + literal.tokenLiteral());
 
     }
 
