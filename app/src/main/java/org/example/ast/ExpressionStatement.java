@@ -12,6 +12,14 @@ public class ExpressionStatement implements Statement {
         this.token = token;
     }
 
+    public Expression getExpression() {
+        return this.expression;
+    }
+
+    public void setExpression(Expression expression) {
+        this.expression = expression;
+    }
+
     @Override
     public void statementNode() {}
 

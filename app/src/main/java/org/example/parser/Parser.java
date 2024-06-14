@@ -1,16 +1,27 @@
 package org.example.parser;
 
-import org.example.ast.Identifier;
-import org.example.ast.LetStatement;
-import org.example.ast.Program;
-import org.example.ast.ReturnStatement;
+import org.example.ast.*;
+import org.example.ast.contracts.Expression;
 import org.example.ast.contracts.Statement;
+import org.example.ast.types.Precedence;
 import org.example.lexer.Lexer;
 import org.example.token.Token;
 import org.example.token.TokenTypes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+@FunctionalInterface
+interface PrefixParseFn {
+    Expression parse();
+}
+
+@FunctionalInterface
+interface InfixParseFn {
+    Expression parse(Expression expression);
+}
 
 public class Parser {
     private Lexer l;
@@ -18,13 +29,31 @@ public class Parser {
     private Token peekToken;
     private List<String> errors;
 
+    private Map<TokenTypes, PrefixParseFn> prefixParseFns = new HashMap<>();
+    private Map<TokenTypes, InfixParseFn> infixParseFns = new HashMap<>();
+
+    public void registerPrefix(TokenTypes tokenType, PrefixParseFn fn) {
+        prefixParseFns.put(tokenType, fn);
+    }
+
+    public void registerInfix(TokenTypes tokenType, InfixParseFn fn) {
+        infixParseFns.put(tokenType, fn);
+    }
+
     public Parser(Lexer l) {
         this.l = l;
         this.errors = new ArrayList<>();
 
+        // Register prefix parse functions
+        registerPrefix(TokenTypes.IDENT, this::parseIdentifier);
+
         // Read two tokens, so curToken and peekToken are both set
         this.nextToken();
         this.nextToken();
+    }
+
+    private Expression parseIdentifier() {
+        return new Identifier(this.curToken, this.curToken.getLiteral());
     }
 
     public void nextToken() {
@@ -61,13 +90,41 @@ public class Parser {
                 return this.parseReturnStatement();
             }
             default -> {
-                return null;
+                return this.parseExpressionStatement();
             }
         }
     }
 
+    /**
+     * Builds an AST Node and fills it by calling the parsing function
+     *
+     * */
+    private Statement parseExpressionStatement() {
+        ExpressionStatement stmt = new ExpressionStatement(this.curToken);
+        stmt.setExpression(this.parseExpression(Precedence.LOWEST.getPrecedence()));
+
+        if (this.peekTokenIs(TokenTypes.SEMICOLON)) {
+            this.nextToken();
+        }
+
+        return stmt;
+    }
+
+    /**
+     * Check whether there's a parsing function associated with the current token
+     * */
+    private Expression parseExpression(int precedence) {
+        PrefixParseFn prefix = prefixParseFns.get(curToken.getType());
+        if (prefix == null) {
+            return null;
+        }
+
+        Expression leftExp = prefix.parse();
+        return leftExp;
+    }
+
     private LetStatement parseLetStatement() {
-        LetStatement stmt = new LetStatement(curToken);
+        LetStatement stmt = new LetStatement(this.curToken);
 
         if (!this.expectPeek(TokenTypes.IDENT)) {
             return null;
@@ -79,7 +136,6 @@ public class Parser {
             return null;
         }
 
-        // TODO: We're skipping the expressions until we encounter a semicolon
         while (!this.curTokenIs(TokenTypes.SEMICOLON)) {
             this.nextToken();
         }
@@ -88,11 +144,10 @@ public class Parser {
     }
 
     private ReturnStatement parseReturnStatement() {
-        ReturnStatement stmt = new ReturnStatement(curToken);
+        ReturnStatement stmt = new ReturnStatement(this.curToken);
 
         this.nextToken();
 
-        // TODO: We're skipping the expressions until we encounter a semicolon
         while (!this.curTokenIs(TokenTypes.SEMICOLON)) {
             this.nextToken();
         }
