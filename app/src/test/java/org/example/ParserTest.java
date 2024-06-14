@@ -1,8 +1,6 @@
 package org.example;
 
-import org.example.ast.LetStatement;
-import org.example.ast.Program;
-import org.example.ast.ReturnStatement;
+import org.example.ast.*;
 import org.example.ast.contracts.Statement;
 import org.example.lexer.Lexer;
 import org.example.parser.Parser;
@@ -39,7 +37,9 @@ public class ParserTest {
 
     @Test
     void testReturnStatements() {
-        // NOTE: Return statement test code
+        /**
+         * Return statement test code
+        */
         String input = "return 5;\n" +
                 "return 10;\n" +
                 "return 993322;\n";
@@ -65,6 +65,41 @@ public class ParserTest {
                 fail("stmt literal is not 'return', got " + stmt.tokenLiteral());
             }
         }
+    }
+
+    @Test
+    void testIdentifierExpression() {
+        /**
+         *  Initializing an identifier expression to test
+         * */
+        String input = "foobar";
+
+        Lexer lexer = new Lexer(input);
+        Parser parser = new Parser(lexer);
+        Program program = parser.parseProgram();
+
+        this.checkParserErrors(parser);
+
+        if (program.getStatements().size() != 1) {
+            StringBuilder msg  = new StringBuilder();
+            msg.append("program does not have enough statements, got=").append(program.getStatements().size());
+            fail(msg.toString());
+        }
+
+        Statement stmt = program.getStatements().get(0);
+        assertTrue(stmt instanceof ExpressionStatement,
+                String.format("program.Statements[0] is not ExpressionStatement. got=%s", stmt.getClass().getSimpleName()));
+
+        ExpressionStatement exprStmt = (ExpressionStatement) stmt;
+        assertTrue(exprStmt.getExpression() instanceof Identifier,
+                String.format("exp not Identifier. got=%s", exprStmt.getExpression().getClass().getSimpleName()));
+
+        Identifier ident = (Identifier) exprStmt.getExpression();
+        assertEquals("foobar", ident.getValue(),
+                String.format("ident.Value not %s. got=%s", "foobar", ident.getValue()));
+        assertEquals("foobar", ident.tokenLiteral(),
+                String.format("ident.TokenLiteral not %s. got=%s", "foobar", ident.tokenLiteral()));
+
     }
 
     private boolean testLetStatement(Statement stmt, String expectedName) {

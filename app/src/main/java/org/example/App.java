@@ -13,9 +13,7 @@ public class App {
         System.out.println("Type in source code to view the tokens 💻");
         System.out.println("Press ctrl+c to exit!");
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("\nProgram terminated.");
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> System.out.println("\nProgram terminated.")));
 
         InputStream input = System.in;
         System.out.print(">> ");
